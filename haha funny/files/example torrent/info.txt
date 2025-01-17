@@ -1,0 +1,4 @@
+title = "Hello"
+date_released = "2025"
+studio = "Clover Works"
+rating = 3.4
