@@ -75,6 +75,10 @@ def draw_scrollbar(scroll_offset):
     pygame.draw.rect(screen, GREY, pygame.Rect(SCREEN_WIDTH - scrollbar_width, 0, scrollbar_width, visible_area))
     pygame.draw.rect(screen, BLACK, pygame.Rect(SCREEN_WIDTH - scrollbar_width, scrollbar_position, scrollbar_width, scrollbar_height))
 
+def throw_error(message):
+    print(message)
+    exit()
+
 def draw_video_details(video):
     screen.fill(WHITE)
     font = pygame.font.Font(None, 36)
@@ -126,7 +130,10 @@ while running:
                 if in_video_menu and selected_video:
                     play_button, back_button = draw_video_details(selected_video)
                     if play_button.collidepoint(mouse_x, mouse_y):
-                        open_video(selected_video["path"])
+                        try:
+                            open_video(selected_video["path"])
+                        except Exception:
+                            throw_error(f"Path Error, tried accessing path: '{selected_video['path']}'")
                     elif back_button.collidepoint(mouse_x, mouse_y):
                         in_video_menu = False
                         selected_video = None
