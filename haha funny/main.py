@@ -4,6 +4,9 @@ import subprocess
 import os
 import save_data
 
+# warning
+print("If you ran an exe file and see this, DO NOT CLOSE ME plzplzplz\nthis is a bug rn im going to fix, so for now plz ignore")
+
 pygame.init()
 
 SCREEN_WIDTH = 800
