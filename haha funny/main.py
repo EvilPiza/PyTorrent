@@ -1,11 +1,7 @@
 import pygame
 import sys
-import subprocess
-import os
+import video_handler
 import save_data
-
-# warning
-print("If you ran an exe file and see this, DO NOT CLOSE ME plzplzplz\nthis is a bug rn im going to fix, so for now plz ignore")
 
 pygame.init()
 
@@ -21,33 +17,47 @@ GREY = (200, 200, 200)
 clock = pygame.time.Clock()
 
 MAIN_DIR = save_data.get_main_directory()
-VIDEO_DIR = MAIN_DIR+"/files"
+VIDEO_DIR = MAIN_DIR + "/files"
 SCROLL_SPEED = 50
 
-def load_videos():
-    videos = []
-    for video_folder in os.listdir(VIDEO_DIR):
-        video_path = os.path.join(VIDEO_DIR, video_folder)
-        if os.path.isdir(video_path):
-            info_path = os.path.join(video_path, "info.txt")
-            if os.path.exists(info_path):
-                with open(info_path, "r") as info_file:
-                    info = [line.split('=')[-1].strip()[1:-1] for line in info_file.readlines()]
-                    video_file = os.path.join(video_path, "video.mp4")
-                    videos.append({"title": info[0], "year released": info[1], "studio": info[2], "rating": info[3], "path": video_file, "rect": pygame.Rect(0, 0, 0, 0)})
-    return videos
+running = True
+in_video_menu = False
+selected_video = None
+scroll_offset = 0
 
-videos = load_videos()
+is_online = False
+button_rect = pygame.Rect(50, 500, 200, 50)
+
+videos = video_handler.load_videos(VIDEO_DIR, is_online)
+
+
+def wrap_text(text, font, box_width):
+    words = text.split(' ')
+    lines = []
+    current_line = words[0]
+
+    for word in words[1:]:
+        test_line = current_line + ' ' + word
+        if font.size(test_line)[0] <= box_width:
+            current_line = test_line 
+        else:
+            lines.append(current_line) 
+            current_line = word
+
+    lines.append(current_line)
+    return lines
 
 def draw_video_boxes(scroll_offset):
     columns = 2
     box_width = 200
     box_height = 200
     margin = 50
-    start_y_pos = 100  
-    border_radius = 20 
+    start_y_pos = 100
+    border_radius = 20
+    font = pygame.font.Font(None, 24)
 
     for index, video in enumerate(videos):
+        
         col = index % columns
         row = index // columns
         x_pos = margin + col * (box_width + margin)
@@ -56,11 +66,13 @@ def draw_video_boxes(scroll_offset):
         if y_pos + box_height > 0 and y_pos < SCREEN_HEIGHT:
             video["rect"] = pygame.Rect(x_pos, y_pos, box_width, box_height)
             pygame.draw.rect(screen, GREY, video["rect"], border_radius=border_radius)
-            
-            font = pygame.font.Font(None, 36)
-            text = font.render(video["title"], True, BLACK)
-            text_rect = text.get_rect(center=video["rect"].center)
-            screen.blit(text, text_rect)
+
+            title_lines = wrap_text(video["title"], font, box_width - 20)
+
+            for i, line in enumerate(title_lines):
+                text = font.render(line, True, BLACK)
+                text_rect = text.get_rect(center=(video["rect"].centerx, video["rect"].top + 20 + i * 30))
+                screen.blit(text, text_rect)
 
 def draw_scrollbar(scroll_offset):
     scrollbar_width = 20
@@ -69,7 +81,7 @@ def draw_scrollbar(scroll_offset):
     scrollbar_ratio = visible_area / total_height
 
     if total_height <= visible_area:
-        scrollbar_height = visible_area 
+        scrollbar_height = visible_area
     else:
         scrollbar_height = max(visible_area * scrollbar_ratio, 40)
 
@@ -77,10 +89,6 @@ def draw_scrollbar(scroll_offset):
 
     pygame.draw.rect(screen, GREY, pygame.Rect(SCREEN_WIDTH - scrollbar_width, 0, scrollbar_width, visible_area))
     pygame.draw.rect(screen, BLACK, pygame.Rect(SCREEN_WIDTH - scrollbar_width, scrollbar_position, scrollbar_width, scrollbar_height))
-
-def throw_error(message):
-    print(message)
-    exit()
 
 def draw_video_details(video):
     screen.fill(WHITE)
@@ -115,13 +123,14 @@ def draw_video_details(video):
 
     return play_button, back_button
 
-def open_video(file_path):
-    subprocess.run(["vlc", file_path])
-
-running = True
-in_video_menu = False
-selected_video = None
-scroll_offset = 0
+def online_button():
+    button_color = GREY if not is_online else (0, 255, 0)
+    button_text = "Online" if is_online else "Offline"
+    pygame.draw.rect(screen, button_color, button_rect, border_radius=10)
+    button_font = pygame.font.Font(None, 36)
+    button_label = button_font.render(button_text, True, BLACK)
+    button_label_rect = button_label.get_rect(center=button_rect.center)
+    screen.blit(button_label, button_label_rect)
 
 while running:
     for event in pygame.event.get():
@@ -134,9 +143,9 @@ while running:
                     play_button, back_button = draw_video_details(selected_video)
                     if play_button.collidepoint(mouse_x, mouse_y):
                         try:
-                            open_video(selected_video["path"])
-                        except Exception:
-                            throw_error(f"Path Error, tried accessing path: '{selected_video['path']}'")
+                            video_handler.play_video(selected_video["path"])
+                        except Exception as e:
+                            print(e)
                     elif back_button.collidepoint(mouse_x, mouse_y):
                         in_video_menu = False
                         selected_video = None
@@ -145,11 +154,16 @@ while running:
                         if video["rect"].collidepoint(mouse_x, mouse_y):
                             selected_video = video
                             in_video_menu = True
-            elif event.button == 4:  # Mouse wheel up
+                if button_rect.collidepoint(mouse_x, mouse_y):
+                    is_online = not is_online
+                    videos = video_handler.load_videos(VIDEO_DIR, is_online)
+                    in_video_menu = False
+                    selected_video = None
+            elif event.button == 4: 
                 scroll_offset -= SCROLL_SPEED
                 if scroll_offset < 0:
                     scroll_offset = 0
-            elif event.button == 5:  # Mouse wheel down
+            elif event.button == 5: 
                 scroll_offset += SCROLL_SPEED
                 if scroll_offset > len(videos) * 250 - SCREEN_HEIGHT:
                     scroll_offset = len(videos) * 250 - SCREEN_HEIGHT
@@ -173,13 +187,13 @@ while running:
     else:
         title_font = pygame.font.Font(None, 48)
         title_text = title_font.render("Available Videos", True, BLACK)
-        
         title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 50 - scroll_offset))
         screen.blit(title_text, title_rect)
-        
+
         draw_video_boxes(scroll_offset)
         draw_scrollbar(scroll_offset)
 
+    online_button()
     pygame.display.update()
 
     clock.tick(60)
