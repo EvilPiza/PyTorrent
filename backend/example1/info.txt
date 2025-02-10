@@ -1,5 +1,0 @@
-title = "Wowza!! 2"
-date_released = "2023"
-studio = "The Wyatt Works"
-rating = "0.3"
-pfolder = "example1"
