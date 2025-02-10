@@ -1,0 +1,5 @@
+title = "Wowza!!"
+date_released = "2020"
+studio = "The Wyatt Works"
+rating = "4.5"
+pfolder = "example2"
