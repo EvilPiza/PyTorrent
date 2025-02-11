@@ -31,7 +31,7 @@ button_rect = pygame.Rect(50, 500, 200, 50)
 videos = video_handler.load_videos(VIDEO_DIR, is_online)
 
 
-def wrap_text(text, font, box_width):
+def wrap_text(text: str, font: pygame.font.Font, box_width: int):
     words = text.split(' ')
     lines = []
     current_line = words[0]
@@ -47,7 +47,7 @@ def wrap_text(text, font, box_width):
     lines.append(current_line)
     return lines
 
-def draw_video_boxes(scroll_offset):
+def draw_video_boxes(scroll_offset: int):
     columns = 2
     box_width = 200
     box_height = 200
@@ -78,7 +78,7 @@ def draw_video_boxes(scroll_offset):
                 text_rect = text.get_rect(center=(video["rect"].centerx, video["rect"].top + 20 + i * 30))
                 screen.blit(text, text_rect)
 
-def draw_scrollbar(scroll_offset):
+def draw_scrollbar(scroll_offset: int):
     scrollbar_width = 20
     total_height = len(videos) * 250 if len(videos) > 0 else 250
     visible_area = SCREEN_HEIGHT
@@ -94,7 +94,7 @@ def draw_scrollbar(scroll_offset):
     pygame.draw.rect(screen, GREY, pygame.Rect(SCREEN_WIDTH - scrollbar_width, 0, scrollbar_width, visible_area))
     pygame.draw.rect(screen, BLACK, pygame.Rect(SCREEN_WIDTH - scrollbar_width, scrollbar_position, scrollbar_width, scrollbar_height))
 
-def draw_video_details(video):
+def draw_video_details(video: dict):
     screen.fill(WHITE)
     font = pygame.font.Font(None, 36)
 
