@@ -56,6 +56,10 @@ def draw_video_boxes(scroll_offset):
     border_radius = 20
     font = pygame.font.Font(None, 24)
 
+    if videos is None:
+        print("Couldn't find any videos! Report this to the devs!!")
+        exit()
+
     for index, video in enumerate(videos):
         
         col = index % columns
@@ -76,7 +80,7 @@ def draw_video_boxes(scroll_offset):
 
 def draw_scrollbar(scroll_offset):
     scrollbar_width = 20
-    total_height = len(videos) * 250
+    total_height = len(videos) * 250 if len(videos) > 0 else 250
     visible_area = SCREEN_HEIGHT
     scrollbar_ratio = visible_area / total_height
 
