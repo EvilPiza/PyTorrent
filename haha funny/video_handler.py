@@ -3,7 +3,7 @@ import os
 import pygame
 import api
 
-def play_video(file_path):
+def play_video(file_path: str):
     vlc_path = r"C:\Program Files\VideoLAN\VLC\vlc.exe"  # Full VLC path
     if os.path.exists(file_path):
         print("Playing:", file_path)
@@ -11,7 +11,7 @@ def play_video(file_path):
     else:
         print("File not found:", file_path)
 
-def load_videos(VIDEO_DIR, is_online):
+def load_videos(VIDEO_DIR: str, is_online: bool):
     if is_online:
         return api.get_posts()  # API fetch for online videos
 
