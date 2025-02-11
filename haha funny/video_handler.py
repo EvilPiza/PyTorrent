@@ -5,7 +5,6 @@ import api
 
 def play_video(file_path):
     vlc_path = r"C:\Program Files\VideoLAN\VLC\vlc.exe"  # Full VLC path
-    file_path = fr'{'\\'.join(file_path.split('/'))}'
     if os.path.exists(file_path):
         print("Playing:", file_path)
         subprocess.run([vlc_path, file_path, "--no-osd"])
@@ -15,6 +14,9 @@ def play_video(file_path):
 def load_videos(VIDEO_DIR, is_online):
     if is_online:
         return api.get_posts()  # API fetch for online videos
+
+    if not os.path.exists(VIDEO_DIR):
+        os.mkdir(os.path.dirname(os.path.abspath(__file__))+'\\files')
 
     # Loading local offline videos
     video_list = []
