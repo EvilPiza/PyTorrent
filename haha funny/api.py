@@ -23,11 +23,11 @@ def get_posts():
         print('Error:', e)
         return None
 
-def download_directory(parent_folder_name):
+def download_directory(parent_folder_name: str):
     os.mkdir(f"files/{parent_folder_name}")
     folder_path = os.path.join(os.getcwd(), 'files', parent_folder_name)
     series = folder_path.split('\\')[-1]
-    
+
     try:
         responses = requests.get(url+f'/get/{series}')
         if responses.status_code != 200:
