@@ -22,6 +22,7 @@ SCROLL_SPEED = 50
 
 running = True
 in_video_menu = False
+selected_series = None
 selected_video = None
 scroll_offset = 0
 
@@ -98,7 +99,7 @@ def draw_video_details(video: dict):
     screen.fill(WHITE)
     font = pygame.font.Font(None, 36)
 
-    title_text = font.render(f"Title: {video['title']}", True, BLACK)
+    title_text = font.render(f'Title: {video["title"]}', True, BLACK)
     screen.blit(title_text, (50, 50))
 
     year_text = font.render(f"Year Released: {video['year released']}", True, BLACK)
@@ -110,9 +111,18 @@ def draw_video_details(video: dict):
     rating_text = font.render(f"Rating: {video['rating']}", True, BLACK)
     screen.blit(rating_text, (50, 200))
 
+    for index, episode in enumerate(video["episodes"]):
+        button = pygame.Rect(525, 100-(index*30), 200, 50)
+        video["episode buttons"].append(button)
+        pygame.draw.rect(screen, GREY, button, border_radius=10)
+        button_text = font.render(episode[:-4], True, BLACK)
+        button_text_rect = button_text.get_rect(center=button.center)
+        screen.blit(button_text, button_text_rect)
+
     play_button = pygame.Rect(50, 250, 200, 50)
     pygame.draw.rect(screen, GREY, play_button, border_radius=10)
-    play_text = font.render("Play", True, BLACK)
+    play_text_text = "Play" if selected_video else "None Selected"
+    play_text = font.render(play_text_text, True, BLACK)
     play_text_rect = play_text.get_rect(center=play_button.center)
     screen.blit(play_text, play_text_rect)
 
@@ -143,25 +153,30 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 mouse_x, mouse_y = event.pos
-                if in_video_menu and selected_video:
-                    play_button, back_button = draw_video_details(selected_video)
-                    if play_button.collidepoint(mouse_x, mouse_y):
+                if in_video_menu and selected_series:
+                    play_button, back_button = draw_video_details(selected_series)
+                    for button in selected_series["episode buttons"]:
+                        if button.collidepoint(mouse_x, mouse_y):
+                            selected_video = selected_series["episodes"][selected_series["episode buttons"].index(button)]
+                    if play_button.collidepoint(mouse_x, mouse_y) and selected_video:
                         try:
-                            video_handler.play_video(selected_video["path"])
+                            video_handler.play_video(selected_series["path"])
                         except Exception as e:
                             print(e)
                     elif back_button.collidepoint(mouse_x, mouse_y):
                         in_video_menu = False
+                        selected_series = None
                         selected_video = None
                 else:
                     for video in videos:
                         if video["rect"].collidepoint(mouse_x, mouse_y):
-                            selected_video = video
+                            selected_series = video
                             in_video_menu = True
                 if button_rect.collidepoint(mouse_x, mouse_y):
                     is_online = not is_online
                     videos = video_handler.load_videos(VIDEO_DIR, is_online)
                     in_video_menu = False
+                    selected_series = None
                     selected_video = None
             elif event.button == 4: 
                 scroll_offset -= SCROLL_SPEED
@@ -174,6 +189,7 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_b:
                 in_video_menu = False
+                selected_series = None
                 selected_video = None
             elif event.key == pygame.K_DOWN:
                 scroll_offset += SCROLL_SPEED
@@ -186,8 +202,8 @@ while running:
 
     screen.fill(WHITE)
 
-    if in_video_menu and selected_video:
-        draw_video_details(selected_video)
+    if in_video_menu and selected_series:
+        draw_video_details(selected_series)
     else:
         title_font = pygame.font.Font(None, 48)
         title_text = title_font.render("Available Videos", True, BLACK)
