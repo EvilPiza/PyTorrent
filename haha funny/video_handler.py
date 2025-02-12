@@ -5,9 +5,12 @@ import api
 
 def play_video(file_path: str):
     vlc_path = r"C:\Program Files\VideoLAN\VLC\vlc.exe"  # Full VLC path
+    file_path = '\\'.join(file_path.split('/'))
+    command = [vlc_path, "--fullscreen", file_path, "--no-osd"]     # Auto fullscreen
+    #command.remove("--fullscreen")    # Uncomment this line for not-auto-fullscreen
     if os.path.exists(file_path):
         print("Playing:", file_path)
-        subprocess.run([vlc_path, file_path, "--no-osd"])
+        subprocess.run(command)
     else:
         print("File not found:", file_path)
 
@@ -27,14 +30,16 @@ def load_videos(VIDEO_DIR: str, is_online: bool):
             if os.path.exists(info_path):
                 with open(info_path, "r") as info_file:
                     info = [line.split('=')[-1].strip()[1:-1] for line in info_file.readlines()]
-                    video_file = video_path + '/' + "video.mp4"
+                    videos = [file for file in os.listdir(video_path) if file.endswith('.mp4')]
                     video_list.append({
                         "title": info[0],
                         "year released": info[1],
                         "studio": info[2],
                         "rating": info[3],
                         "pfolder": info[4],
-                        "path": video_file,
+                        "path": video_path,
+                        "episodes": videos,
+                        "episode buttons": [],
                         "rect": pygame.Rect(0, 0, 200, 200)  # Initialize with a default rect
                     })
     return video_list
