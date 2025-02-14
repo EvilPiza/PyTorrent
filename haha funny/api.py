@@ -5,12 +5,18 @@ import os
 
 url = 'https://pytorrent.onrender.com'
 
+def get_error(error_code: int) -> None:
+    if error_code == 503:
+        print("Database is down right now! Try again later plz!! (Error: 503)")
+    else:
+        print(f"Yikes got error code '{error_code}' you should probably report this to the devs")
+
 def get_posts():
     try:
         response = requests.get(url)
 
         if response.status_code != 200:
-            print(f"Yikes got error code '{response.status_code}' you should probably report this to the devs")
+            get_error(response.status_code)
             return None
 
         posts = response.json()
@@ -29,17 +35,17 @@ def download_directory(parent_folder_name: str):
     series = folder_path.split('\\')[-1]
 
     try:
-        responses = requests.get(url+f'/get/{series}')
-        if responses.status_code != 200:
-            print(f"Yikes got error code '{responses.status_code}' you should probably report this to the devs")
+        response = requests.get(url+f'/get/{series}')
+        if response.status_code != 200:
+            get_error(response.status_code)
             return None
 
-        for response in responses.json():
+        for post in response.json():
             with open(folder_path+'/video.mp4', 'wb') as videoFile:
-                videoFile.write(base64.b64decode(response['binary']))
+                videoFile.write(base64.b64decode(post['binary']))
             
             with open(folder_path+'/info.txt', 'w') as infoFile:
-                infoFile.write(f'title = "{response["title"]}"\ndate_released = "{response["year released"]}"\nstudio = "{response["studio"]}"\nrating = "{response["rating"]}"')
+                infoFile.write(f'title = "{post["title"]}"\ndate_released = "{post["year released"]}"\nstudio = "{post["studio"]}"\nrating = "{post["rating"]}"')
 
     except requests.exceptions.RequestException as e:
         print('Error:', e)
