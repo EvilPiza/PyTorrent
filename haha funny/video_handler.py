@@ -8,6 +8,10 @@ def play_video(file_path: str):
     file_path = '\\'.join(file_path.split('/'))
     command = [vlc_path, "--fullscreen", file_path, "--no-osd"]     # Auto fullscreen
     #command.remove("--fullscreen")    # Uncomment this line for not-auto-fullscreen
+    
+    if not os.path.exists(vlc_path):
+        print("PyTorrent requires VLC to run! plz download it!! If you did and still get this error then report this to the devs plz!!")
+        
     if os.path.exists(file_path):
         print("Playing:", file_path)
         subprocess.run(command)
@@ -19,7 +23,7 @@ def load_videos(VIDEO_DIR: str, is_online: bool):
         return api.get_posts()  # API fetch for online videos
 
     if not os.path.exists(VIDEO_DIR):
-        os.mkdir(os.path.dirname(os.path.abspath(__file__))+'\\files')
+        os.mkdir(os.path.dirname(os.path.abspath(__file__))+'/files')
 
     # Loading local offline videos
     video_list = []
