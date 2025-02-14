@@ -1,7 +1,7 @@
 ***Since this is privated for now, TODOS!!***
 
 - More colors!! (Probably lowest prio)
-- Fix connection between front/backend (Done)
+- Fix connection between front/backend (Front end done, back still broke)
 - Optimize code :(
 - Preferences!! (for more customization) (Highest prio)
 - Finish type annotations lol
