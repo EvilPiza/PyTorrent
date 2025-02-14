@@ -3,7 +3,7 @@ import pygame
 import base64
 import os
 
-url = 'https://onrender.pytorrent.com'
+url = 'https://pytorrent.onrender.com'
 
 def get_posts():
     try:
