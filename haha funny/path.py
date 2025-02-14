@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+import os
 
 def select_folder():
     folder_path = filedialog.askdirectory()
@@ -9,6 +10,7 @@ def select_folder():
         return folder_path
     else:
         print("No folder selected")
+    # return os.path.abspath(os.curdir) # Potential optimization :)
 
 if __name__ == "__main__":
     root = tk.Tk()
