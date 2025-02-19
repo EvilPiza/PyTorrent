@@ -6,7 +6,7 @@
 
 **Once these are done then *MAYBE* i'll release v1**
 
-**Might DOs**
+***Might DOs:***
 
 - Rewrite frontend in something other than python lmao (prolly js) (backend is alr perfect)
 - Make backend public
