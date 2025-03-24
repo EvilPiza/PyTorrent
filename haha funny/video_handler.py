@@ -30,7 +30,7 @@ def load_videos(VIDEO_DIR: str, is_online: bool):
     for video_folder in os.listdir(VIDEO_DIR):
         video_path = VIDEO_DIR + '/' +video_folder
         if os.path.isdir(video_path):
-            info_path = os.path.join(video_path, "info.txt")
+            info_path = os.path.join(video_path, f"{video_folder}_info.txt")
             if os.path.exists(info_path):
                 with open(info_path, "r") as info_file:
                     info = [line.split('=')[-1].strip()[1:-1] for line in info_file.readlines()]
