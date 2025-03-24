@@ -44,6 +44,6 @@ def load_videos(VIDEO_DIR: str, is_online: bool):
                         "path": video_path,
                         "episodes": videos,
                         "episode buttons": [],
-                        "rect": pygame.Rect(0, 0, 200, 200)  # Initialize with a default rect
+                        "rect": pygame.Rect(0, 0, 200, 200)  # initialize with a default rect
                     })
     return video_list

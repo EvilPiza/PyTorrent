@@ -18,3 +18,5 @@ if __name__ == "__main__":
     root.withdraw()
     select_folder()
     root.quit()
+
+# This file is so ehhh like Auto Path is just too good, Manual Path could be good for some use cases, like you want the videos to be stored somewhere specific but other than that, Auto is the goat

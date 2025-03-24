@@ -4,7 +4,6 @@ import video_handler
 import save_data
 import api
 
-#if __name__ == "__main__":
 pygame.init()
 
 SCREEN_WIDTH = 800

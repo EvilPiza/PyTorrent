@@ -4,7 +4,7 @@ import base64
 import os
 import loading
 
-url = 'http://127.0.0.1:50000'#'https://pytorrent.onrender.com'
+url = 'https://pytorrent.onrender.com'
 
 def get_error(error_code: int) -> None:
     if error_code == 503:
