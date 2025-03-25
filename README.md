@@ -1,8 +1,11 @@
+backend broke rn sowwy
+
 ***TODOS!!***
 
 - More colors!! (Probably lowest prio)
 - ~~Fix connection between front/backend~~
 - Customizable UI!! (Highest prio)
+- Upload Video System (Actual Highest prio)
 
 ***Might DOs:***
 
