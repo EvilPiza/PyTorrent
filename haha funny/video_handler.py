@@ -23,7 +23,7 @@ def load_videos(VIDEO_DIR: str, is_online: bool):
         return api.get_posts()  # API fetch for online videos
 
     if not os.path.exists(VIDEO_DIR):
-        os.mkdir(os.path.dirname(os.path.abspath(__file__))+'/files')
+        os.mkdir(os.path.dirname(os.path.abspath(__file__))+'\\files')
 
     # Loading local offline videos
     video_list = []

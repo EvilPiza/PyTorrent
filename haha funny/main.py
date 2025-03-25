@@ -17,7 +17,7 @@ GREY = (200, 200, 200)
 
 clock = pygame.time.Clock()
 
-VIDEO_DIR = save_data.get_main_directory() + "/files"
+VIDEO_DIR = save_data.get_main_directory() + "\\files"
 SCROLL_SPEED = 50
 
 running = True
