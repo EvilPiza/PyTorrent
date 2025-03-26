@@ -2,7 +2,6 @@ import pygame
 import sys
 import video_handler
 import save_data
-import api
 
 pygame.init()
 
@@ -14,10 +13,13 @@ pygame.display.set_caption("pytorrent go brrr")
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREY = (200, 200, 200)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 
 clock = pygame.time.Clock()
 
-VIDEO_DIR = save_data.get_main_directory() + "\\files"
+MAIN_DIR = save_data.get_main_directory()
+VIDEO_DIR = MAIN_DIR + "/files"
 SCROLL_SPEED = 50
 
 running = True
@@ -30,6 +32,7 @@ is_online = False
 button_rect = pygame.Rect(50, 500, 200, 50)
 
 videos = video_handler.load_videos(VIDEO_DIR, is_online)
+
 
 def wrap_text(text: str, font: pygame.font.Font, box_width: int):
     words = text.split(' ')
@@ -113,17 +116,17 @@ def draw_video_details(video: dict):
     for index, episode in enumerate(video["episodes"]):
         button = pygame.Rect(525, 100-(index*30), 200, 50)
         video["episode buttons"].append(button)
-        pygame.draw.rect(screen, GREY, button, border_radius=10)
-        button_text = font.render(episode[:-4], True, BLACK)
+        episode_button_color = BLUE if selected_video == episode else GREY
+        pygame.draw.rect(screen, episode_button_color, button, border_radius=10)
+        button_text_color = WHITE if episode_button_color == BLUE else BLACK
+        button_text = font.render(episode[:-4], True, button_text_color)
         button_text_rect = button_text.get_rect(center=button.center)
         screen.blit(button_text, button_text_rect)
 
     play_button = pygame.Rect(50, 250, 200, 50)
-    pygame.draw.rect(screen, GREY, play_button, border_radius=10)
-    if is_online:
-        play_text_text = "Download"
-    else:
-        play_text_text = "Play" if selected_video else "None Selected"
+    play_button_color = GREEN if selected_video else GREY
+    play_text_text = "Play" if selected_video else "None Selected"
+    pygame.draw.rect(screen, play_button_color, play_button, border_radius=10)
     play_text = font.render(play_text_text, True, BLACK)
     play_text_rect = play_text.get_rect(center=play_button.center)
     screen.blit(play_text, play_text_rect)
@@ -149,14 +152,6 @@ def online_button():
     screen.blit(button_label, button_label_rect)
 
 while running:
-
-    if is_online and not selected_series:
-        pygame.display.set_caption(f"pytorrent - Connected To: {api.url}")
-    elif (is_online and selected_series) or (not is_online and selected_series):
-        pygame.display.set_caption(f"pytorrent - Viewing {selected_series['title']}")
-    else:
-        pygame.display.set_caption(f"pytorrent - Browsing locally")
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -168,14 +163,11 @@ while running:
                     for button in selected_series["episode buttons"]:
                         if button.collidepoint(mouse_x, mouse_y):
                             selected_video = selected_series["episodes"][selected_series["episode buttons"].index(button)]
-                    if play_button.collidepoint(mouse_x, mouse_y):
-                        if is_online:
-                            api.download_directory(selected_series['pfolder'])
-                        elif selected_video:
-                            try:
-                                video_handler.play_video(selected_series["path"])
-                            except Exception as e:
-                                print(e)
+                    if play_button.collidepoint(mouse_x, mouse_y) and selected_video:
+                        try:
+                            video_handler.play_video(selected_series["path"])
+                        except Exception as e:
+                            print(e)
                     elif back_button.collidepoint(mouse_x, mouse_y):
                         in_video_menu = False
                         selected_series = None
@@ -185,13 +177,21 @@ while running:
                         if video["rect"].collidepoint(mouse_x, mouse_y):
                             selected_series = video
                             in_video_menu = True
-
                 if button_rect.collidepoint(mouse_x, mouse_y):
                     is_online = not is_online
                     videos = video_handler.load_videos(VIDEO_DIR, is_online)
                     in_video_menu = False
                     selected_series = None
                     selected_video = None
+
+            elif event.button == 3:
+                mouse_x, mouse_y = event.pos
+                if in_video_menu and selected_series:
+                    play_button, back_button = draw_video_details(selected_series)
+                    for button in selected_series["episode buttons"]:
+                        if button.collidepoint(mouse_x, mouse_y):
+                            selected_video = None
+
             elif event.button == 4: 
                 scroll_offset -= SCROLL_SPEED
                 if scroll_offset < 0:
